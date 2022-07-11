@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { request } from 'express';
 
 // criando uma instância de express
 const app = express();
@@ -53,6 +53,18 @@ app.put('/livros/:id', (req, res) => {
     livros[index].titulo = req.body.titulo;
 
     res.status(200).json(livros);
+});
+
+// criando a rota para delete
+
+app.delete('/livros/:id', (req, res) => {
+    // usando destructuring
+    const { id } =  req.params;
+    const index = encontraLivro(id);
+
+    // usando a função splice para apagar o indice informado
+    livros.splice(index, 1);
+    res.status(200).send(`Livro ${id} removido com sucesso`);
 });
 
 // função que retorna o índice do livro com o id passado
