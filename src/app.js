@@ -1,21 +1,20 @@
-import express, { request } from 'express';
+import express from 'express';
+import db from './config/dbConnect.js';
+import livros from './models/Livro.js';
+
+// Prevendo eventual erro na conexão e usando bind para juntar no console, uma mensagem de erro
+db.on("error", console.log.bind(console, 'Erro de conexão'));
+
+// Tentando a conexão uma vez, e informando caso sucesso
+db.once("open", () => {
+    console.log("A conexão com o banco de dados foi feita com sucesso!");
+});
 
 // criando uma instância de express
 const app = express();
 
 // recurso que interpreta o que chega em forma de json no request
 app.use(express.json());
-
-const livros = [
-    {
-        id: 1,
-        "titulo": "Senhor dos anéis",
-    },
-    {
-        id: 2,
-        "titulo": "O Hobbit",
-    }
-];
 
 // criando uma rota para request tipo get '/' 
 app.get('/', (req, res) => {
@@ -24,7 +23,12 @@ app.get('/', (req, res) => {
 
 // criando uma rota para request tipo get '/livros' 
 app.get('/livros', (req, res) => {
-    res.status(200).json(livros);
+
+    // usando o método find para recuperar todos os registros
+    livros.find((err, livros) => {
+        res.status(200).json(livros);
+    });
+
 });
 
 
@@ -59,7 +63,7 @@ app.put('/livros/:id', (req, res) => {
 
 app.delete('/livros/:id', (req, res) => {
     // usando destructuring
-    const { id } =  req.params;
+    const { id } = req.params;
     const index = encontraLivro(id);
 
     // usando a função splice para apagar o indice informado
